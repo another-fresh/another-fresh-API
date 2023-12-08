@@ -3,11 +3,32 @@ const {response} = require('../helpers/common')
 const { sendGmail } = require('../helpers/mailer')
 
 exports.insertCheckout = async(req, res) => {
-    const { nama, telepon, alamat, buah, qty, hargaTotal, id } = req.body
-    const data = { nama, telepon, alamat, buah, qty, hargaTotal, id };
+    let harga = 0;
+    const { nama, telepon, alamat, buah, qty, id_pembelian } = req.body
+    if (buah === 'Anggur Red Globe' && qty === '0.25') {
+            harga = 13500
+        } else if (buah === 'Anggur Red Globe' && qty === '0.50'){
+            harga = 24500
+        } else if (buah === 'Anggur Hijau' && qty === '0.25'){
+            harga = 19000
+        } else if (buah === 'Anggur Hijau' && qty === '0.50'){
+            harga = 36000
+        } else if (buah === 'Anggur Hitam' && qty === '0.25'){
+            harga = 14000
+        } else if (buah === 'Anggur Hitam' && qty === '0.50'){
+            harga = 26000
+        } else if (buah === 'Anggur Red Globe'){
+            harga = 42000 * qty;    
+        } else if (buah === 'Anggur Hijau'){
+            harga = 72000 * qty;
+        } else {
+            harga = 43000 * qty;
+        }
+        let data = { nama, telepon, alamat, buah, qty, harga, id_pembelian };
     try {
         let result = await checkoutModel.insert(data)
-        console.log('masuk db');
+        // console.log(data);
+        // console.log('masuk db');
         if(result){
             await sendGmail( data.nama, data.telepon, data.alamat, data.buah, data.qty, data.harga, data.id_pembelian )
             return res.send({status: 200, message: 'success check email'})
@@ -16,22 +37,6 @@ exports.insertCheckout = async(req, res) => {
     } catch (error) {
         console.log(error);
         response(res, null, 'failed', 400, 'insert data checkout failed')  
-    }
-}
-
-exports.insertPrice = async(req, res) => {
-    const idPembelian = req.body.id;
-    const hargaTotal = req.body.harga;
-    // const data = { harga, id };
-    try {
-        console.log('belum masuk db');
-        console.log(hargaTotal);
-        await checkoutModel.inputHarga(hargaTotal, idPembelian);
-        console.log('harga masuk db');
-        response(res, null, 'success', 200, 'insert data price success')
-    } catch (error) {
-        console.log(error);
-        response(res, null, 'failed', 400, 'insert data price failed')
     }
 }
 

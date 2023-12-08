@@ -5,6 +5,5 @@ const checkoutController = require('../controllers/checkout')
 router.post('/', checkoutController.insertCheckout)
 router.get('/', checkoutController.getCheckout)
 router.get('/:id', checkoutController.getCheckoutById)
-router.put('/', checkoutController.insertPrice)
 
 module.exports = router
